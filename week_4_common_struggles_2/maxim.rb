@@ -8,38 +8,30 @@ def parse_input(input)
   input.readline.strip.split(' ').map(&:to_i)
 end
 
-def cumsum(array)
-  sum = 0
-  array.map do |elem|
-    sum += elem
-    sum
-  end
-end
-
 def main(input, output)
   x = parse_input(input)
 
-  a = cumsum(x)
-  b = cumsum(x.reverse).reverse
+  x_len = x.size
+  y = Array.new(x_len) { 0 }
 
-  index_l = 0
-  index_r = 0
-
-  n_max = x.size
-  y = Array.new(n_max) { 0 }
-
-  1.upto(n_max) do |n|
-    if index_l == n - 1
-      index_l = b[0..(n - 1)].max
-    end
-    if index_r < n
-      index_r = a[(n - 1)..].max
-      index_r = index_r + n - 1
-    end
-    if index_l > 1
-      y[n] = a[index_r - 1] - a[index_l - 2]
+  lsum = 0
+  0.upto(x_len - 1) do |n|
+    if lsum < 0
+      y[n] = x[n]
+      lsum = x[n]
     else
-      y[n] = a[index_r - 1]
+      lsum = lsum + x[n]
+      y[n] = lsum
+    end
+  end
+
+  rsum = 0
+  (x_len - 1).downto(0) do |n|
+    if rsum < 0
+      rsum = x[n]
+    else
+      y[n] = y[n] + rsum
+      rsum = rsum + x[n]
     end
   end
 
@@ -55,4 +47,4 @@ if input.isatty
   STR
 end
 
-puts main(input, STDOUT)
+puts main(input, STDOUT).join(' ')
